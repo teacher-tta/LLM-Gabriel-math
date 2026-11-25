@@ -1,0 +1,2090 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#080a0b">
+<title>The Haunted Maths Room - Maths Quiz</title>
+<style>
+    * { box-sizing: border-box; }
+
+    body {
+        margin: 0;
+        min-height: 100vh;
+        padding: 20px;
+        overflow-x: hidden;
+        color: #fff;
+        font-family: "Trebuchet MS", Arial, sans-serif;
+        background:
+            radial-gradient(circle at 15% 20%, #42116b 0, transparent 35%),
+            radial-gradient(circle at 85% 75%, #003f63 0, transparent 35%),
+            radial-gradient(circle at 50% 50%, #171047 0, transparent 65%),
+            #050510;
+        background-size: 150% 150%;
+        animation: backgroundMove 12s ease-in-out infinite alternate;
+    }
+
+    @keyframes backgroundMove {
+        from { background-position: 0% 0%; }
+        to { background-position: 100% 100%; }
+    }
+
+    .decoration {
+        position: fixed;
+        z-index: 0;
+        pointer-events: none;
+        user-select: none;
+        font-size: 35px;
+        opacity: .7;
+    }
+    .d1 { top: 8%; left: 5%; animation: floatOne 7s ease-in-out infinite; }
+    .d2 { top: 20%; right: 7%; animation: spin 12s linear infinite; }
+    .d3 { bottom: 15%; left: 8%; animation: floatOne 9s ease-in-out infinite reverse; }
+    .d4 { bottom: 12%; right: 6%; animation: spin 15s linear infinite reverse; }
+    .d5 { top: 55%; left: 2%; animation: floatOne 8s ease-in-out infinite; }
+    .d6 { top: 55%; right: 2%; animation: floatOne 10s ease-in-out infinite reverse; }
+
+    @keyframes floatOne {
+        0%, 100% { transform: translateY(0) rotate(-10deg); }
+        50% { transform: translateY(-35px) rotate(15deg); }
+    }
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+    .container {
+        position: relative;
+        z-index: 2;
+        width: 100%;
+        max-width: 700px;
+        margin: 25px auto;
+        padding: 30px;
+        border: 2px solid #813cff;
+        border-radius: 25px;
+        background: rgba(14, 14, 37, .96);
+        box-shadow: 0 0 15px #852cff, 0 0 35px rgba(0, 225, 255, .3), inset 0 0 25px rgba(90, 40, 255, .12);
+    }
+
+    h1 {
+        margin: 5px 0;
+        color: #fff;
+        text-align: center;
+        font-size: clamp(30px, 7vw, 48px);
+        text-shadow: 0 0 8px #00eeff, 0 0 20px #873cff, 0 0 35px #ff00cc;
+        animation: titleBounce 3s ease-in-out infinite;
+    }
+    @keyframes titleBounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-6px); }
+    }
+
+    .subtitle { margin-bottom: 20px; color: #cbbaff; text-align: center; line-height: 1.6; }
+
+    .ticker {
+        margin: 20px -30px;
+        padding: 12px 0;
+        overflow: hidden;
+        white-space: nowrap;
+        background: linear-gradient(90deg, #7500ff, #e000a8, #006eff, #7500ff);
+        background-size: 300% 100%;
+        animation: tickerGlow 6s linear infinite;
+    }
+    .ticker span {
+        display: inline-block;
+        padding-left: 100%;
+        font-weight: bold;
+        letter-spacing: 2px;
+        animation: tickerMove 20s linear infinite;
+    }
+    @keyframes tickerGlow {
+        from { background-position: 0% 50%; }
+        to { background-position: 300% 50%; }
+    }
+    @keyframes tickerMove {
+        from { transform: translateX(0); }
+        to { transform: translateX(-100%); }
+    }
+
+    button, select, input { font: inherit; }
+    button {
+        border: 0;
+        border-radius: 12px;
+        padding: 14px 18px;
+        color: #fff;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        background: linear-gradient(135deg, #7800ff, #ec00c8);
+        box-shadow: 0 0 12px #9c39ff, 0 5px 0 #39006d;
+        transition: transform .2s, box-shadow .2s;
+    }
+    button:hover:not(:disabled) {
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 0 0 20px #ff00dd, 0 0 35px #00d9ff;
+    }
+    button:active:not(:disabled) { transform: scale(.97); }
+    button:disabled { opacity: .55; cursor: not-allowed; }
+    .start-button {
+        width: 100%;
+        margin: 18px 0;
+        padding: 19px;
+        font-size: 21px;
+        background: linear-gradient(135deg, #00a6ff, #8b00ff, #fa00bb);
+        animation: buttonGlow 2.5s ease-in-out infinite;
+    }
+    @keyframes buttonGlow {
+        0%, 100% { box-shadow: 0 0 12px #00d9ff, 0 5px 0 #39006d; }
+        50% { box-shadow: 0 0 25px #ff00df, 0 0 45px #7e00ff; }
+    }
+    .secondary-button {
+        width: 100%;
+        margin: 4px 0;
+        background: linear-gradient(135deg, #263e81, #4a267d);
+    }
+    .next-button {
+        width: 100%;
+        margin-top: 12px;
+        background: linear-gradient(135deg, #00bb93, #008bff);
+    }
+
+    .level-panel {
+        margin-top: 12px;
+        padding: 16px;
+        border: 1px solid #8a44ff;
+        border-radius: 14px;
+        background: rgba(25, 19, 65, .9);
+    }
+    .level-panel label, label {
+        display: block;
+        margin-bottom: 9px;
+        color: #e3d4ff;
+        font-weight: bold;
+    }
+    select, input {
+        width: 100%;
+        padding: 14px;
+        border: 2px solid #8b45ff;
+        border-radius: 12px;
+        color: #fff;
+        background: #080a20;
+        font-size: 17px;
+    }
+    select { margin-bottom: 12px; }
+    select:focus, input:focus {
+        outline: none;
+        border-color: #00eeff;
+        box-shadow: 0 0 15px #00cfff;
+    }
+
+    .quiz-info { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 25px 0; }
+    .info-card {
+        padding: 18px 10px;
+        border: 1px solid #8a44ff;
+        border-radius: 16px;
+        background: linear-gradient(145deg, rgba(46, 24, 95, .9), rgba(9, 24, 61, .95));
+        text-align: center;
+        box-shadow: 0 0 15px rgba(125, 50, 255, .5);
+    }
+    .info-card span { display: block; margin-bottom: 8px; color: #c3b4ff; font-size: 14px; }
+    .info-card strong { display: block; color: #00f0ff; font-size: 29px; text-shadow: 0 0 10px #00cfff, 0 0 20px #007fff; }
+
+    .question-area {
+        margin: 20px 0;
+        padding: 25px 15px;
+        border: 2px solid #00cfff;
+        border-radius: 18px;
+        background: linear-gradient(135deg, rgba(32, 18, 77, .95), rgba(12, 38, 73, .95));
+        text-align: center;
+        box-shadow: 0 0 15px rgba(0, 220, 255, .35), inset 0 0 20px rgba(110, 0, 255, .15);
+        animation: cardFloat 4s ease-in-out infinite;
+    }
+    @keyframes cardFloat {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-4px); }
+    }
+    .question-number { color: #ff9af0; font-size: 15px; font-weight: bold; }
+    .question {
+        margin: 18px 0;
+        color: white;
+        font-size: clamp(28px, 6vw, 40px);
+        overflow-wrap: anywhere;
+        text-shadow: 0 0 10px #00d9ff, 0 0 25px #853cff;
+    }
+    .question-hint { color: #b7a1ff; }
+
+    input {
+        margin-bottom: 14px;
+        text-align: center;
+        font-size: 21px;
+        box-shadow: 0 0 12px rgba(130, 0, 255, .4);
+    }
+    input:disabled { opacity: .65; }
+    .answer-button { width: 100%; }
+
+    .feedback { min-height: 28px; margin-top: 20px; text-align: center; font-size: 17px; font-weight: bold; }
+    .correct { color: #00ff9d; text-shadow: 0 0 12px #00ff80; animation: celebrate .7s ease-in-out; }
+    .incorrect { color: #ff668e; text-shadow: 0 0 12px #ff004c; animation: shake .4s ease-in-out; }
+    @keyframes celebrate {
+        0% { transform: scale(.8) rotate(-4deg); }
+        60% { transform: scale(1.12) rotate(3deg); }
+        100% { transform: scale(1) rotate(0); }
+    }
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+    }
+
+    .result {
+        margin-top: 22px;
+        padding: 22px;
+        border: 2px solid #00ffcc;
+        border-radius: 18px;
+        background: linear-gradient(135deg, #142b44, #301052, #102d45);
+        text-align: center;
+        line-height: 1.8;
+        box-shadow: 0 0 20px rgba(0, 255, 200, .5), 0 0 35px rgba(160, 0, 255, .3);
+    }
+    .result h2 { margin-top: 0; color: #00ffcc; text-shadow: 0 0 15px #00ffcc; }
+    .result strong { color: #ffdb57; }
+    .result-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+    .result-actions button { width: 100%; }
+
+    .surprise-popup {
+        position: fixed;
+        z-index: 30;
+        width: min(235px, calc(100vw - 24px));
+        padding: 15px 12px;
+        border: 3px solid #fff;
+        border-radius: 18px;
+        pointer-events: none;
+        text-align: center;
+        background: linear-gradient(135deg, #ff00bb, #6500ff, #007bff);
+        box-shadow: 0 0 15px #ff00bb, 0 0 35px #00dfff;
+        animation: surprisePop 2.4s ease-in-out forwards;
+    }
+    .surprise-emoji { display: block; margin-bottom: 6px; font-size: 38px; }
+    .surprise-title { display: block; color: #fffb00; font-size: 22px; font-weight: 900; text-shadow: 0 0 10px #ff8c00; }
+    .surprise-message { display: block; margin-top: 6px; color: white; font-size: 13px; font-weight: bold; }
+    @keyframes surprisePop {
+        0% { opacity: 0; transform: scale(.1) rotate(-25deg); }
+        12% { opacity: 1; transform: scale(1.15) rotate(7deg); }
+        22% { transform: scale(.95) rotate(-3deg); }
+        32%, 75% { opacity: 1; transform: scale(1) rotate(0); }
+        100% { opacity: 0; transform: scale(.2) rotate(20deg); }
+    }
+    .surprise-word {
+        position: fixed;
+        z-index: 29;
+        left: 50%;
+        top: 35%;
+        pointer-events: none;
+        color: #ffeb3b;
+        font-size: clamp(30px, 8vw, 60px);
+        font-weight: 1000;
+        text-shadow: 3px 3px 0 #ff00aa, 0 0 20px #00eaff;
+        animation: wordBurst 1.3s ease-out forwards;
+    }
+    @keyframes wordBurst {
+        0% { opacity: 0; transform: translate(-50%, -50%) scale(.1) rotate(-20deg); }
+        35% { opacity: 1; transform: translate(-50%, -50%) scale(1.35) rotate(8deg); }
+        100% { opacity: 0; transform: translate(-50%, -50%) scale(.8) rotate(-8deg); }
+    }
+
+    .footer { margin-top: 28px; color: #ad9be8; text-align: center; font-size: 12px; letter-spacing: 2px; }
+    .hidden { display: none !important; }
+
+    @media (max-width: 480px) {
+        body { padding: 10px; }
+        .container { margin: 10px auto; padding: 20px; }
+        .ticker { margin-right: -20px; margin-left: -20px; }
+        .info-card strong { font-size: 25px; }
+        .decoration { font-size: 24px; }
+        .result-actions { grid-template-columns: 1fr; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+            animation-duration: .01ms !important;
+            animation-iteration-count: 1 !important;
+            scroll-behavior: auto !important;
+        }
+    }
+
+
+    /* =============================================
+       HAUNTED THEME OVERRIDES
+    ============================================= */
+    body {
+        background:
+            radial-gradient(ellipse at 12% 18%, rgba(83, 25, 110, .42), transparent 36%),
+            radial-gradient(ellipse at 88% 78%, rgba(15, 83, 65, .28), transparent 38%),
+            radial-gradient(ellipse at 50% 110%, rgba(94, 20, 43, .28), transparent 55%),
+            #05040b;
+        background-size: 160% 160%;
+    }
+    body::before, body::after {
+        content: "";
+        position: fixed;
+        inset: -20%;
+        z-index: 0;
+        pointer-events: none;
+    }
+    body::before {
+        background: radial-gradient(ellipse at 50% 75%, rgba(95, 255, 170, .055), transparent 48%);
+        filter: blur(28px);
+        animation: hauntedFog 18s ease-in-out infinite alternate;
+    }
+    body::after {
+        opacity: .22;
+        background-image: radial-gradient(#d8ffd2 1px, transparent 1px), radial-gradient(#ba9cff 1px, transparent 1px);
+        background-size: 83px 83px, 127px 127px;
+        background-position: 0 0, 37px 51px;
+        animation: graveyardDrift 45s linear infinite;
+    }
+    @keyframes hauntedFog {
+        from { transform: translate(-3%, 2%) scale(1); opacity: .45; }
+        to { transform: translate(4%, -2%) scale(1.12); opacity: .9; }
+    }
+    @keyframes graveyardDrift {
+        from { transform: translateY(0); }
+        to { transform: translateY(-80px); }
+    }
+    .decoration { opacity: .72; filter: drop-shadow(0 0 10px rgba(175, 255, 204, .55)); }
+    .container {
+        border-color: #76519a;
+        background: rgba(10, 8, 17, .94);
+        box-shadow: 0 0 22px rgba(111, 42, 147, .55), 0 0 45px rgba(27, 89, 67, .18), inset 0 0 28px rgba(100, 38, 115, .12);
+    }
+    h1 {
+        color: #f1eaff;
+        text-shadow: 0 0 8px #9e72d1, 0 0 21px #56266f, 0 0 35px rgba(112, 255, 174, .28);
+        animation: hauntedTitle 4.4s ease-in-out infinite;
+    }
+    @keyframes hauntedTitle {
+        0%, 100% { transform: translateY(0); text-shadow: 0 0 8px #9e72d1, 0 0 21px #56266f; }
+        50% { transform: translateY(-3px); text-shadow: 0 0 12px #b894e8, 0 0 28px #56266f, 0 0 38px rgba(112, 255, 174, .35); }
+    }
+    .subtitle { color: #c7b9d8; }
+    .ticker {
+        background: linear-gradient(90deg, #160d25, #40152d, #17382f, #160d25);
+        border-top: 1px solid #79558c;
+        border-bottom: 1px solid #456b57;
+        animation: none;
+    }
+    .ticker span { color: #e8d9f4; }
+    button {
+        background: linear-gradient(135deg, #44235f, #702744);
+        box-shadow: 0 0 12px rgba(143, 82, 167, .45), 0 5px 0 #21112c;
+    }
+    button:hover:not(:disabled) {
+        box-shadow: 0 0 18px rgba(182, 121, 208, .55), 0 0 28px rgba(100, 203, 139, .2);
+    }
+    .start-button {
+        background: linear-gradient(135deg, #314e43, #563164, #742a45);
+        animation: hauntedButtonGlow 3.2s ease-in-out infinite;
+    }
+    @keyframes hauntedButtonGlow {
+        0%, 100% { box-shadow: 0 0 12px rgba(113, 202, 139, .35), 0 5px 0 #21112c; }
+        50% { box-shadow: 0 0 22px rgba(173, 117, 208, .55), 0 0 32px rgba(113, 202, 139, .18); }
+    }
+    .secondary-button { background: linear-gradient(135deg, #282039, #463052); }
+    .level-panel { border-color: #624b72; background: rgba(18, 14, 27, .94); }
+    select, input { border-color: #69517c; background: #090811; }
+    select:focus, input:focus { border-color: #a3dfa9; box-shadow: 0 0 14px rgba(121, 224, 157, .3); }
+    .quiz-info .info-card {
+        border-color: #625074;
+        background: linear-gradient(145deg, rgba(32, 25, 46, .96), rgba(10, 25, 22, .96));
+        box-shadow: 0 0 16px rgba(111, 73, 135, .22);
+    }
+    .info-card span { color: #c2b3ce; }
+    .info-card strong { color: #b8f4bf; text-shadow: 0 0 10px rgba(121, 237, 150, .5); }
+    .question-area {
+        border-color: #7b6390;
+        background: linear-gradient(135deg, rgba(24, 17, 37, .98), rgba(13, 34, 27, .96));
+        box-shadow: 0 0 18px rgba(110, 74, 138, .22), inset 0 0 20px rgba(91, 157, 107, .07);
+    }
+    .question-number { color: #c6a5dc; }
+    .question { text-shadow: 0 0 10px rgba(151, 112, 190, .65), 0 0 22px rgba(108, 200, 130, .22); }
+    .question-hint { color: #b6c8b6; }
+    .feedback.correct { color: #a8ffbd; text-shadow: 0 0 12px rgba(93, 255, 132, .45); }
+    .feedback.incorrect { color: #ff9baf; text-shadow: 0 0 12px rgba(255, 70, 104, .4); }
+    .result {
+        border-color: #8fbd91;
+        background: linear-gradient(135deg, #111c18, #21142b, #101b16);
+        box-shadow: 0 0 20px rgba(120, 190, 132, .18), 0 0 35px rgba(122, 75, 143, .2);
+    }
+    .result h2 { color: #c5efc5; text-shadow: 0 0 15px rgba(143, 224, 157, .5); }
+    .result strong { color: #e5c8ff; }
+    .surprise-popup {
+        background: linear-gradient(135deg, #191222, #3b1835, #163427);
+        border-color: #b9e3b2;
+        box-shadow: 0 0 17px rgba(178, 231, 170, .42), 0 0 32px rgba(163, 105, 190, .3);
+    }
+    .surprise-title { color: #d7ffb8; text-shadow: 0 0 10px rgba(146, 255, 153, .5); }
+    .surprise-message { color: #f3e8fb; }
+    .surprise-word { color: #d7ffb8; text-shadow: 3px 3px 0 #4a214f, 0 0 20px rgba(137, 255, 165, .7); }
+    .footer { color: #9c8ba9; }
+
+    .music-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        margin: 18px 0 22px;
+        padding: 13px 15px;
+        border: 1px solid #59456a;
+        border-radius: 14px;
+        background: rgba(20, 15, 27, .88);
+    }
+    .music-copy { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+    .music-copy strong { color: #d8c4e8; font-size: 13px; letter-spacing: .7px; }
+    .music-copy span { color: #a99bb0; font-size: 12px; }
+    .music-toggle { flex: 0 0 auto; padding: 11px 13px; font-size: 12px; background: linear-gradient(135deg, #263d32, #4b2858); box-shadow: 0 0 10px rgba(137, 112, 155, .25); }
+    .music-toggle[aria-pressed="true"] { border: 1px solid #a9dda9; box-shadow: 0 0 15px rgba(142, 235, 154, .25); }
+    @media (max-width: 480px) {
+        .music-bar { align-items: stretch; flex-direction: column; }
+        .music-toggle { width: 100%; }
+    }
+
+
+
+/* =============================================
+   CINEMATIC REALISM SKIN - ABANDONED SCHOOLHOUSE
+   Self-contained photorealistic background image.
+============================================= */
+:root {
+    color-scheme: dark;
+    --old-brass: #9d8158;
+    --chalk: #d9d6c9;
+    --muted: #aaa69a;
+    --deep: #090b0d;
+}
+html { min-height: 100%; background: #050709; }
+body {
+    position: relative;
+    min-height: 100vh;
+    padding: 26px 18px;
+    color: var(--chalk);
+    font-family: Georgia, "Times New Roman", serif;
+    background-image:
+        linear-gradient(180deg, rgba(3, 5, 8, .36), rgba(3, 5, 8, .62) 45%, rgba(3, 5, 8, .78)),
+        url("data:image/webp;base64,[REDACTED LIKELY SECRET]");
+    background-position: center center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    animation: none;
+}
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+        radial-gradient(ellipse at 12% 38%, rgba(77, 136, 181, .12), transparent 36%),
+        radial-gradient(ellipse at 85% 72%, rgba(177, 107, 42, .10), transparent 30%),
+        linear-gradient(90deg, rgba(0,0,0,.22), transparent 38%, rgba(0,0,0,.24));
+    animation: roomLight 9s ease-in-out infinite alternate;
+}
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: .12;
+    background-image: repeating-linear-gradient(0deg, transparent 0 3px, rgba(255,255,255,.035) 4px, transparent 5px);
+    mix-blend-mode: screen;
+}
+@keyframes roomLight {
+    0%, 88%, 100% { opacity: .72; }
+    90% { opacity: .48; }
+    92% { opacity: .80; }
+    95% { opacity: .60; }
+}
+.decoration { display: none !important; }
+.container {
+    z-index: 2;
+    max-width: 760px;
+    margin: 18px auto;
+    padding: clamp(22px, 4vw, 38px);
+    border: 1px solid rgba(169, 139, 96, .60);
+    border-radius: 5px;
+    background:
+        linear-gradient(135deg, rgba(14, 16, 17, .87), rgba(8, 11, 12, .86)),
+        repeating-linear-gradient(90deg, rgba(255,255,255,.015) 0 1px, transparent 1px 5px);
+    box-shadow: 0 24px 75px rgba(0,0,0,.72), inset 0 0 0 5px rgba(150, 119, 76, .06), 0 0 30px rgba(0,0,0,.38);
+    backdrop-filter: blur(9px);
+}
+h1 {
+    margin: 2px 0 11px;
+    color: #e7e0d0;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(25px, 5vw, 39px);
+    font-weight: 600;
+    letter-spacing: .10em;
+    line-height: 1.2;
+    text-align: center;
+    text-shadow: 0 2px 8px rgba(0,0,0,.9), 0 0 18px rgba(155, 177, 184, .18);
+    animation: none;
+}
+.subtitle { color: #b6b1a5; letter-spacing: .035em; font-size: 14px; }
+.ticker {
+    margin: 20px -10px;
+    padding: 12px 8px;
+    text-align: center;
+    white-space: normal;
+    background: rgba(4, 7, 8, .78);
+    border-top: 1px solid rgba(157, 129, 88, .38);
+    border-bottom: 1px solid rgba(157, 129, 88, .38);
+    animation: none;
+}
+.ticker span {
+    display: block;
+    padding: 0;
+    color: #b7a88e;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 11px;
+    letter-spacing: .22em;
+    animation: none;
+}
+button {
+    color: #e2d9c8;
+    border: 1px solid rgba(173, 145, 102, .55);
+    border-radius: 3px;
+    background: linear-gradient(180deg, #34332e, #1a1c1a);
+    box-shadow: inset 0 1px rgba(255,255,255,.08), 0 4px 12px rgba(0,0,0,.45);
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight: 600;
+    letter-spacing: .045em;
+    text-transform: uppercase;
+}
+button:hover:not(:disabled) {
+    transform: translateY(-1px);
+    border-color: #c1a477;
+    background: linear-gradient(180deg, #4a4539, #24251f);
+    box-shadow: inset 0 1px rgba(255,255,255,.10), 0 7px 18px rgba(0,0,0,.55);
+}
+button:active:not(:disabled) { transform: translateY(1px); }
+.start-button {
+    color: #efe4ce;
+    border-color: rgba(186, 148, 91, .72);
+    background: linear-gradient(180deg, #51402d, #28231d);
+    animation: none;
+}
+.start-button:hover:not(:disabled) { background: linear-gradient(180deg, #665039, #34291f); }
+.secondary-button, .next-button { background: linear-gradient(180deg, #303936, #191f1d); }
+.level-panel { border: 1px solid rgba(157,129,88,.45); border-radius: 4px; background: rgba(6,9,10,.88); }
+label { color: #d0c6b2 !important; font-family: Georgia, "Times New Roman", serif; }
+select, input {
+    color: #e6e0d4;
+    border: 1px solid rgba(165, 145, 114, .60);
+    border-radius: 3px;
+    background: rgba(5, 8, 9, .94);
+    font-family: Georgia, "Times New Roman", serif;
+}
+select:focus, input:focus { border-color: #b89c6b; box-shadow: 0 0 0 2px rgba(184,156,107,.14); }
+.quiz-info .info-card {
+    border: 1px solid rgba(157,129,88,.45);
+    border-radius: 4px;
+    background: linear-gradient(145deg, rgba(25,28,27,.96), rgba(9,13,13,.96));
+    box-shadow: inset 0 1px rgba(255,255,255,.035), 0 8px 24px rgba(0,0,0,.25);
+}
+.info-card span { color: #aaa393; font-family: Georgia, "Times New Roman", serif; font-size: 11px; letter-spacing: .13em; }
+.info-card strong { color: #d0bd92; font-family: Georgia, "Times New Roman", serif; font-size: 27px; text-shadow: 0 1px 8px rgba(193,160,103,.26); }
+.question-area {
+    position: relative;
+    margin: 22px 0;
+    padding: 28px 18px;
+    overflow: hidden;
+    border: 1px solid rgba(157,129,88,.7);
+    border-radius: 3px;
+    background:
+        radial-gradient(ellipse at 50% 0%, rgba(151,168,143,.11), transparent 70%),
+        linear-gradient(135deg, rgba(17,24,22,.98), rgba(7,12,12,.98));
+    box-shadow: inset 0 0 35px rgba(0,0,0,.55), 0 12px 24px rgba(0,0,0,.24);
+    animation: none;
+}
+.question-area::after {
+    content: "";
+    position: absolute;
+    inset: 7px;
+    pointer-events: none;
+    border: 1px solid rgba(218,204,167,.08);
+}
+.question-number { color: #b6a78b; font-size: 11px; letter-spacing: .18em; }
+.question {
+    color: #e5e1d6;
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight: 500;
+    letter-spacing: .025em;
+    text-shadow: 0 2px 7px rgba(0,0,0,.9);
+}
+.question-hint { color: #a5a193; font-family: Georgia, "Times New Roman", serif; font-size: 12px; letter-spacing: .06em; }
+input { font-size: 20px; box-shadow: inset 0 2px 8px rgba(0,0,0,.65); }
+.answer-button { width: 100%; }
+.feedback { color: #d7d0c2; font-family: Georgia, "Times New Roman", serif; letter-spacing: .025em; }
+.feedback.correct { color: #b7cba9; text-shadow: 0 0 9px rgba(153,190,133,.25); }
+.feedback.incorrect { color: #d59d94; text-shadow: 0 0 9px rgba(190,88,77,.22); }
+.result {
+    border: 1px solid rgba(157,177,139,.6);
+    border-radius: 4px;
+    background: linear-gradient(145deg, rgba(17,24,20,.98), rgba(19,17,21,.98));
+    box-shadow: inset 0 0 25px rgba(0,0,0,.35), 0 12px 30px rgba(0,0,0,.35);
+}
+.result h2 { color: #d8d0b9; font-family: Georgia, "Times New Roman", serif; text-shadow: 0 1px 8px rgba(201,181,139,.25); }
+.result strong { color: #d6bd8b; }
+.footer { color: #918979; font-family: Georgia, "Times New Roman", serif; font-size: 10px; letter-spacing: .22em; }
+.music-bar {
+    border: 1px solid rgba(157,129,88,.48);
+    border-radius: 4px;
+    background: rgba(7,10,10,.88);
+    box-shadow: 0 8px 22px rgba(0,0,0,.25);
+}
+.music-copy strong { color: #d7c8ac; font-family: Georgia, "Times New Roman", serif; font-size: 12px; letter-spacing: .13em; }
+.music-copy span { color: #9d998e; font-family: Georgia, "Times New Roman", serif; }
+.music-toggle { border-color: rgba(157,129,88,.55); background: linear-gradient(180deg, #383329, #1a1b19); box-shadow: none; }
+.music-toggle[aria-pressed="true"] { border-color: #9aa789; box-shadow: 0 0 12px rgba(143,170,123,.18); }
+.surprise-popup {
+    border: 1px solid rgba(178,151,111,.76);
+    border-radius: 3px;
+    background: linear-gradient(145deg, rgba(9,12,12,.97), rgba(26,23,22,.97));
+    box-shadow: 0 16px 35px rgba(0,0,0,.72), inset 0 0 22px rgba(146,116,77,.08);
+    backdrop-filter: blur(7px);
+    animation: realisticSurprise 3s ease-in-out forwards;
+}
+.surprise-emoji { color: #ab9a78; font-family: Georgia, "Times New Roman", serif; font-size: 27px; }
+.surprise-title { color: #d8c5a2; font-family: Georgia, "Times New Roman", serif; font-size: 16px; font-weight: 600; letter-spacing: .08em; text-shadow: 0 1px 8px rgba(184,153,107,.24); }
+.surprise-message { color: #b8b3a8; font-family: Georgia, "Times New Roman", serif; font-size: 12px; font-weight: normal; }
+@keyframes realisticSurprise {
+    0% { opacity: 0; transform: translateY(9px) scale(.97); }
+    12%, 78% { opacity: 1; transform: translateY(0) scale(1); }
+    100% { opacity: 0; transform: translateY(-7px) scale(.99); }
+}
+.surprise-word {
+    left: 50%; top: 35%;
+    color: #e1d6bf;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(20px, 5vw, 39px);
+    font-weight: 500;
+    letter-spacing: .10em;
+    text-align: center;
+    text-shadow: 0 3px 15px rgba(0,0,0,.95), 0 0 20px rgba(173,150,112,.35);
+    animation: realisticWord 2s ease-out forwards;
+}
+@keyframes realisticWord {
+    0% { opacity: 0; transform: translate(-50%,-50%) scale(.94); filter: blur(4px); }
+    25% { opacity: 1; transform: translate(-50%,-50%) scale(1); filter: blur(0); }
+    75% { opacity: .9; }
+    100% { opacity: 0; transform: translate(-50%,-58%) scale(1.015); }
+}
+.ember-particle {
+    position: fixed;
+    z-index: 31;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    pointer-events: none;
+    background: #d7b879;
+    box-shadow: 0 0 8px 2px rgba(214,164,88,.42);
+    animation: emberRise 1.6s ease-out forwards;
+}
+@keyframes emberRise {
+    from { opacity: 0; transform: translate3d(0,0,0) scale(.5); }
+    20% { opacity: .8; }
+    to { opacity: 0; transform: translate3d(var(--drift), calc(-1 * var(--rise)), 0) scale(.1); }
+}
+@media (max-width: 480px) {
+    body { background-attachment: scroll; }
+    .container { margin: 8px auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+    body::before { animation: none; }
+    .ember-particle { animation: none; opacity: 0; }
+}
+
+
+
+    /* Automatic level campaign and final-boss styling */
+    .campaign-progress {
+        margin: 8px 0 20px;
+        padding: 13px 15px;
+        border: 1px solid rgba(157, 129, 88, .48);
+        background: rgba(7, 9, 10, .82);
+    }
+    .campaign-progress-top {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 9px;
+        color: #d7cbb7;
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: 12px;
+        letter-spacing: .09em;
+        text-transform: uppercase;
+    }
+    .progress-rail {
+        height: 7px;
+        overflow: hidden;
+        border-radius: 20px;
+        background: #252126;
+        box-shadow: inset 0 1px 3px rgba(0,0,0,.8);
+    }
+    .progress-fill {
+        display: block;
+        width: 0;
+        height: 100%;
+        background: linear-gradient(90deg, #6f9b70, #c4ad78);
+        box-shadow: 0 0 10px rgba(174, 215, 154, .35);
+        transition: width .5s ease;
+    }
+    .next-level-notice {
+        margin-top: 15px;
+        padding: 12px;
+        border: 1px solid rgba(180, 153, 108, .4);
+        background: rgba(5, 7, 8, .65);
+        color: #e1d2b7;
+        font-family: Georgia, "Times New Roman", serif;
+        letter-spacing: .04em;
+    }
+    .campaign-history {
+        margin-top: 18px;
+        padding-top: 14px;
+        border-top: 1px solid rgba(180, 153, 108, .35);
+        text-align: left;
+    }
+    .campaign-history h3 {
+        color: #d9c8a8;
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: 15px;
+        letter-spacing: .12em;
+        text-align: center;
+    }
+    .campaign-history-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 7px 0;
+        border-bottom: 1px solid rgba(255,255,255,.08);
+        color: #c9c0b3;
+        font-size: 13px;
+    }
+    .campaign-history-row strong { color: #e5d7bd; }
+    .question-area.final-boss {
+        border-color: #a77b4a;
+        background: linear-gradient(140deg, rgba(35, 18, 20, .98), rgba(28, 22, 17, .98));
+        box-shadow: 0 0 24px rgba(150, 69, 38, .24), inset 0 0 24px rgba(182, 122, 61, .08);
+    }
+    .question-area.final-boss .question-number { color: #e8bb83; }
+    .question-area.final-boss .question { color: #f4dfbf; text-shadow: 0 0 14px rgba(201, 139, 76, .25); }
+    .final-boss-banner {
+        margin: 0 0 14px;
+        color: #d9b17c;
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: 11px;
+        letter-spacing: .22em;
+        text-align: center;
+    }
+
+
+
+/* =============================================
+   NIGHTMARE EVENT — CINEMATIC, NON-GRAPHIC SCARE
+============================================= */
+.nightmare-toggle {
+    flex: 0 0 auto;
+    padding: 11px 13px;
+    border: 1px solid rgba(160, 105, 105, .62);
+    background: linear-gradient(180deg, #382526, #191516);
+    color: #e3caca;
+    box-shadow: 0 0 10px rgba(125, 49, 49, .22);
+    font-size: 12px;
+}
+.nightmare-toggle[aria-pressed="true"] {
+    border-color: #ba7770;
+    box-shadow: 0 0 13px rgba(165, 65, 65, .28);
+}
+.nightmare-note {
+    display: block;
+    margin-top: 5px;
+    color: #9d8b89;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 11px;
+    line-height: 1.45;
+}
+.nightmare-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    padding: 20px;
+    background:
+        radial-gradient(ellipse at 50% 48%, rgba(45, 34, 31, .42), rgba(0, 0, 0, .94) 68%),
+        rgba(0, 0, 0, .88);
+    backdrop-filter: blur(3px);
+    cursor: pointer;
+    animation: nightmareFadeIn .22s ease-out both;
+}
+.nightmare-overlay.hidden { display: none !important; }
+.nightmare-overlay.leaving { animation: nightmareFadeOut .42s ease-in both; }
+.nightmare-scene {
+    width: min(1120px, 96vw);
+    max-height: 90vh;
+    display: grid;
+    place-items: center;
+    transform-origin: center;
+    animation: nightmareFigureIn .72s cubic-bezier(.17,.78,.24,1.12) both;
+}
+.nightmare-image {
+    display: block;
+    width: 100%;
+    max-height: 88vh;
+    height: auto;
+    object-fit: contain;
+    border: 1px solid rgba(137, 91, 72, .32);
+    border-radius: 5px;
+    box-shadow:
+        0 0 28px rgba(120, 33, 28, .22),
+        0 18px 70px rgba(0, 0, 0, .78);
+    user-select: none;
+    -webkit-user-drag: none;
+}
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+body.nightmare-shake { animation: nightmareRattle .38s ease-out; }
+@keyframes nightmareFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+@keyframes nightmareFadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+@keyframes nightmareFigureIn {
+    0% { opacity: 0; transform: scale(.72) translateY(22px); filter: blur(10px); }
+    68% { opacity: 1; transform: scale(1.035) translateY(0); filter: blur(0); }
+    100% { opacity: 1; transform: scale(1); filter: blur(0); }
+}
+@keyframes nightmareRattle {
+    0%, 100% { transform: translateX(0); }
+    22% { transform: translateX(-3px); }
+    48% { transform: translateX(3px); }
+    72% { transform: translateX(-2px); }
+}
+@media (max-width: 480px) {
+    .nightmare-toggle { width: 100%; }
+    .nightmare-overlay { padding: 8px; }
+    .nightmare-scene { width: 98vw; max-height: 88vh; }
+    .nightmare-image { max-height: 86vh; border-radius: 3px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .nightmare-overlay,
+    .nightmare-scene,
+    body.nightmare-shake {
+        animation: none !important;
+    }
+}
+
+</style>
+</head>
+<body>
+
+<div id="nightmareOverlay" class="nightmare-overlay hidden" aria-hidden="true" role="alert" aria-live="assertive" title="Click to dismiss">
+    <div class="nightmare-scene">
+        <img
+            class="nightmare-image"
+            src="data:image/webp;base64,[REDACTED LIKELY SECRET]"
+            alt="A dark hooded figure with faint glowing red eyes, standing in a doorway. The image reads: You are not alone. Room 13 — something is watching."
+            draggable="false"
+        >
+        <span class="visually-hidden">You are not alone. Room 13 — something is watching.</span>
+    </div>
+</div>
+
+
+<main class="container">
+    <h1>THE HAUNTED MATHS ROOM</h1>
+    <p class="subtitle">AFTER-HOURS MATHEMATICS EXAMINATION<br>Begin at K2. Each completed level unlocks the next door. Reach the final boss.</p>
+
+    <div class="ticker" aria-hidden="true">
+        <span>AFTER HOURS • NO STAFF ON DUTY • THE BELL RINGS AT MIDNIGHT • ROOM 13</span>
+    </div>
+
+    <div class="music-bar">
+        <div class="music-copy"><strong>THE NIGHT WATCH</strong><span>Original atmospheric soundtrack</span><span class="nightmare-note">Nightmare effects are enabled by default. Switch them off any time.</span></div>
+        <button id="musicToggleBtn" class="music-toggle" type="button" aria-pressed="false">PLAY HAUNTED SCORE</button>
+        <button id="nightmareToggleBtn" class="nightmare-toggle" type="button" aria-pressed="true">NIGHTMARE: ON</button>
+    </div>
+
+    <!-- The campaign always begins at K2 and advances automatically. -->
+    <section id="setupArea">
+        <h2 style="text-align:center;color:#d9ff9c;">THE EXAMINATION BEGINS AT K2</h2>
+        <p class="subtitle">Start at Kindergarten 2. Every level unlocks automatically after the previous one.</p>
+        <p class="subtitle">12 school and advanced stages, followed by one ultimate final-boss challenge.</p>
+        <button id="startK2Btn" class="start-button" type="button">ENTER THE CLASSROOM — BEGIN AT K2</button>
+    </section>
+
+    <section id="quizPanel" class="hidden" aria-live="polite">
+        <div class="campaign-progress" aria-label="Campaign progress">
+            <div class="campaign-progress-top">
+                <span id="stageLabel">STAGE 1 OF 13 · K2</span>
+                <span id="stagePercent">8%</span>
+            </div>
+            <div class="progress-rail"><span id="progressFill" class="progress-fill"></span></div>
+        </div>
+        <div class="quiz-info">
+            <div class="info-card">
+                <span>TIME ELAPSED</span>
+                <strong id="timer">00:00</strong>
+            </div>
+            <div class="info-card">
+                <span>YOUR SCORE</span>
+                <strong id="score">0 / 10</strong>
+            </div>
+        </div>
+
+        <div class="question-area">
+            <p class="question-number">QUESTION <span id="questionNumber">1 / 10</span></p>
+            <h2 class="question" id="question"></h2>
+            <p class="question-hint">WORK CAREFULLY. THE ROOM IS QUIET.</p>
+        </div>
+
+        <div id="answerForm">
+            <label for="answerInput">ENTER YOUR ANSWER</label>
+            <input id="answerInput" type="text" placeholder="Your answer here..." autocomplete="off" inputmode="text" spellcheck="false">
+            <button id="submitBtn" class="answer-button" type="button">CHECK ANSWER</button>
+        </div>
+
+        <p id="feedback" class="feedback" role="status" aria-live="polite"></p>
+
+        <div id="result" class="result hidden" aria-live="polite">
+            <h2 id="resultHeading">LEVEL CLEARED</h2>
+            <p><strong>Level:</strong> <span id="finalLevel"></span></p>
+            <p><strong>Score:</strong> <span id="finalScore"></span></p>
+            <p><strong>Percentage:</strong> <span id="finalPercentage"></span></p>
+            <p><strong>Time for this level:</strong> <span id="finalTime"></span></p>
+            <p id="finalMessage"></p>
+            <p id="nextLevelNotice" class="next-level-notice"></p>
+            <div id="campaignHistory" class="campaign-history hidden"></div>
+            <button id="restartCampaignBtn" class="start-button hidden" type="button">RESTART FROM K2</button>
+        </div>
+    </section>
+
+    <div class="footer">ROOM 13 · EST. 1897</div>
+</main>
+
+<script>
+"use strict";
+
+// =============================================
+// 1. QUESTION BANK: ALL ORIGINAL LEVELS
+// =============================================
+
+const questionsByLevel = {
+    "K1": [
+        { q: "2 + 3 =", a: "5" },
+        { q: "1 + 4 =", a: "5" },
+        { q: "3 + 2 =", a: "5" },
+        { q: "4 + 1 =", a: "5" },
+        { q: "5 - 2 =", a: "3" },
+        { q: "1 + 1 =", a: "2" },
+        { q: "2 + 2 =", a: "4" },
+        { q: "5 - 3 =", a: "2" },
+        { q: "3 - 1 =", a: "2" },
+        { q: "1 + 3 =", a: "4" }
+    ],
+
+    "K2": [
+        { q: "6 + 4 =", a: "10" },
+        { q: "8 - 3 =", a: "5" },
+        { q: "7 + 2 =", a: "9" },
+        { q: "5 + 5 =", a: "10" },
+        { q: "9 - 4 =", a: "5" },
+        { q: "10 - 7 =", a: "3" },
+        { q: "4 + 5 =", a: "9" },
+        { q: "3 + 7 =", a: "10" },
+        { q: "6 - 1 =", a: "5" },
+        { q: "7 - 3 =", a: "4" }
+    ],
+
+    "Primary 1": [
+        { q: "12 + 8 =", a: "20" },
+        { q: "15 - 7 =", a: "8" },
+        { q: "10 + 5 =", a: "15" },
+        { q: "20 - 9 =", a: "11" },
+        { q: "7 + 6 =", a: "13" },
+        { q: "18 - 8 =", a: "10" },
+        { q: "9 + 4 =", a: "13" },
+        { q: "11 - 5 =", a: "6" },
+        { q: "13 + 2 =", a: "15" },
+        { q: "14 - 7 =", a: "7" }
+    ],
+
+    "Primary 2": [
+        { q: "3 × 4 =", a: "12" },
+        { q: "8 ÷ 2 =", a: "4" },
+        { q: "5 × 3 =", a: "15" },
+        { q: "12 ÷ 4 =", a: "3" },
+        { q: "6 × 2 =", a: "12" },
+        { q: "10 ÷ 5 =", a: "2" },
+        { q: "7 × 3 =", a: "21" },
+        { q: "9 ÷ 3 =", a: "3" },
+        { q: "4 × 5 =", a: "20" },
+        { q: "15 ÷ 3 =", a: "5" }
+    ],
+
+    "Primary 3": [
+        { q: "7 × 6 =", a: "42" },
+        { q: "18 ÷ 6 =", a: "3" },
+        { q: "5/10 + 2/10 =", a: "7/10" },
+        { q: "8 × 7 =", a: "56" },
+        { q: "9 ÷ 3 =", a: "3" },
+        { q: "1/2 + 1/3 =", a: "5/6" },
+        { q: "12 × 4 =", a: "48" },
+        { q: "20 ÷ 5 =", a: "4" },
+        { q: "3/4 - 1/4 =", a: "1/2" },
+        { q: "6 × 5 =", a: "30" }
+    ],
+
+    "Primary 4": [
+        { q: "3/5 + 2/5 =", a: "1" },
+        { q: "0.6 + 0.3 =", a: "0.9" },
+        { q: "Area of a rectangle: length 5 cm, width 3 cm =", a: "15" },
+        { q: "5 × 12 =", a: "60" },
+        { q: "0.8 - 0.5 =", a: "0.3" },
+        { q: "7/10 - 2/10 =", a: "1/2" },
+        { q: "15 ÷ 3 =", a: "5" },
+        { q: "Perimeter of a square with side 4 cm =", a: "16" },
+        { q: "9 × 8 =", a: "72" },
+        { q: "Convert 0.25 to a fraction =", a: "1/4" }
+    ],
+
+    "Primary 5": [
+        { q: "What is 50% of 80?", a: "40" },
+        { q: "Average of 10, 15 and 20 =", a: "15" },
+        { q: "20% of 60 =", a: "12" },
+        { q: "Median of 3, 5, 7, 9, 11 =", a: "7" },
+        { q: "70 + 30% of 70 =", a: "91" },
+        { q: "Find 15% of 200 =", a: "30" },
+        { q: "Mode of 2, 3, 3, 5 =", a: "3" },
+        { q: "What is 125% of 40?", a: "50" },
+        { q: "Convert 0.75 to a percentage (enter number only) =", a: "75" },
+        { q: "200 ÷ 4 =", a: "50" }
+    ],
+
+    "Primary 6": [
+        { q: "Solve for x: 3x + 5 = 20", a: "5" },
+        { q: "Ratio 2:3, total 15. Find the first part.", a: "6" },
+        { q: "Simplify 18/24.", a: "3/4" },
+        { q: "If 5x = 35, find x.", a: "7" },
+        { q: "Ratio 4:1, total 25. Find the smaller part.", a: "5" },
+        { q: "Solve for x: x/4 = 6", a: "24" },
+        { q: "Simplify 45/60.", a: "3/4" },
+        { q: "If 3y = 18, find y.", a: "6" },
+        { q: "What is 3/5 of 50?", a: "30" },
+        { q: "Solve: 2x - 4 = 10", a: "7" }
+    ],
+
+    "Secondary 1": [
+        { q: "Solve for x: 2x + 3 = 7", a: "2" },
+        { q: "Solve for x: x - 4 = 5", a: "9" },
+        { q: "Solve for x: 3x = 12", a: "4" },
+        { q: "Solve for x: x/2 = 6", a: "12" },
+        { q: "Solve for x: 5x + 2 = 17", a: "3" },
+        { q: "Solve for x: x + 6 = 11", a: "5" },
+        { q: "Solve for x: 4x = 20", a: "5" },
+        { q: "Solve for x: 3x + 1 = 10", a: "3" },
+        { q: "Solve for x: x - 3 = 4", a: "7" },
+        { q: "Solve for x: 2x = 8", a: "4" }
+    ],
+
+    "Secondary 2": [
+        { q: "Find y if y = 2x + 3 and x = 4.", a: "11" },
+        { q: "Factorise: x² - 9", a: "(x-3)(x+3)" },
+        { q: "Solve: 2x - 5 = 9", a: "7" },
+        { q: "Find the gradient through (1,2) and (3,6).", a: "2" },
+        { q: "Simplify: 3(x + 4) - 2x", a: "x+12" },
+        { q: "Find the distance between (0,0) and (3,4).", a: "5" },
+        { q: "If y = 3x, find y when x = 7.", a: "21" },
+        { q: "Solve: 4x + 2 = 14", a: "3" },
+        { q: "Factorise: x² + 5x + 6", a: "(x+2)(x+3)" },
+        { q: "Simplify: 2x - (3x - 5)", a: "-x+5" }
+    ],
+
+    "Secondary 3": [
+        { q: "Solve: x² - 5x + 6 = 0", a: "2 or 3" },
+        { q: "Find sin 30°.", a: "0.5" },
+        { q: "Factorise: x² - 16", a: "(x-4)(x+4)" },
+        { q: "Solve the inequality: 3x - 4 > 5", a: "x>3" },
+        { q: "Find tan 45°.", a: "1" },
+        { q: "Find the roots of x² + x - 6 = 0.", a: "2 or -3" },
+        { q: "Solve: 2x² = 8", a: "2 or -2" },
+        { q: "Find cos 60°.", a: "0.5" },
+        { q: "What is the shape of the graph y = x²?", a: "parabola" },
+        { q: "Solve: |x - 4| = 2", a: "6 or 2" }
+    ],
+
+    "Secondary 4": [
+        { q: "Differentiate f(x) = x².", a: "2x" },
+        { q: "Find the sum of the first 5 natural numbers.", a: "15" },
+        { q: "Solve for n: 2n + 5 = 17", a: "6" },
+        { q: "Find the nth term: 3, 6, 9, 12, ...", a: "3n" },
+        { q: "Find the area under y = 3x from x = 0 to x = 2.", a: "6" },
+        { q: "Evaluate the limit (x² - 4)/(x - 2) as x approaches 2.", a: "4" },
+        { q: "Find the 5th term: 2, 4, 8, 16, ...", a: "32" },
+        { q: "Integrate f(x) = 4x.", a: "2x²+C" },
+        { q: "Solve e^x = 7 for x.", a: "ln(7)" },
+        { q: "Differentiate sin(x).", a: "cos(x)" }
+    ],
+
+    "PhD": [
+        { q: "Evaluate the integral from 0 to 1 of x² dx.", a: "1/3" },
+        { q: "Find the derivative of f(x) = sin(x).", a: "cos(x)" },
+        { q: "Evaluate the limit sin(x)/x as x approaches 0.", a: "1" },
+        { q: "What is the eigenvalue of the identity matrix?", a: "1" },
+        { q: "Is every group of order 2 cyclic?", a: "True" },
+        { q: "Find the Laplace transform of f(t) = 1.", a: "1/s" },
+        { q: "Sum of the infinite geometric series with a = 1 and r = 1/2.", a: "2" },
+        { q: "What is the Riemann Hypothesis about?", a: "Zeros of the Riemann zeta function" },
+        { q: "Solve dy/dx = y.", a: "Ce^x" },
+        { q: "Is the set of rational numbers countable?", a: "Yes" }
+    ],
+
+    "ULTIMATE FINAL BOSS": [
+        {
+            q: "FINAL BOSS: The P versus NP problem is one of the Clay Mathematics Institute's Millennium Prize Problems. What is its current status? (Answer: open or unsolved)",
+            a: "unsolved"
+        }
+    ]
+};
+
+// =============================================
+// 2. GAME STATE
+// =============================================
+
+// K1 remains in the question bank for reference, but this campaign
+// intentionally begins at K2 and proceeds in the order below.
+const levelOrder = [
+    "K2",
+    "Primary 1", "Primary 2", "Primary 3", "Primary 4", "Primary 5", "Primary 6",
+    "Secondary 1", "Secondary 2", "Secondary 3", "Secondary 4",
+    "PhD",
+    "ULTIMATE FINAL BOSS"
+];
+
+let currentLevelIndex = 0;
+let currentLevel = "K2";
+let questions = [];
+let questionIndex = 0;
+let score = 0;
+let startTime = null;
+let campaignStartTime = null;
+let stopwatchInterval = null;
+let surpriseTimeout = null;
+let advanceTimeout = null;
+let transitionTimeout = null;
+let answeredCurrent = false;
+let quizFinished = false;
+let levelResults = [];
+
+// =============================================
+// 3. GET PAGE ELEMENTS
+// =============================================
+
+const setupArea = document.getElementById("setupArea");
+const quizPanel = document.getElementById("quizPanel");
+const startK2Btn = document.getElementById("startK2Btn");
+const stageLabel = document.getElementById("stageLabel");
+const stagePercent = document.getElementById("stagePercent");
+const progressFill = document.getElementById("progressFill");
+const timerDisplay = document.getElementById("timer");
+const scoreDisplay = document.getElementById("score");
+const questionNumber = document.getElementById("questionNumber");
+const questionDisplay = document.getElementById("question");
+const questionArea = document.querySelector(".question-area");
+const questionHint = document.querySelector(".question-hint");
+const answerForm = document.getElementById("answerForm");
+const answerInput = document.getElementById("answerInput");
+const submitBtn = document.getElementById("submitBtn");
+const feedback = document.getElementById("feedback");
+const result = document.getElementById("result");
+const resultHeading = document.getElementById("resultHeading");
+const finalLevel = document.getElementById("finalLevel");
+const finalScore = document.getElementById("finalScore");
+const finalPercentage = document.getElementById("finalPercentage");
+const finalTime = document.getElementById("finalTime");
+const finalMessage = document.getElementById("finalMessage");
+const nextLevelNotice = document.getElementById("nextLevelNotice");
+const campaignHistory = document.getElementById("campaignHistory");
+const restartCampaignBtn = document.getElementById("restartCampaignBtn");
+const nightmareToggleBtn = document.getElementById("nightmareToggleBtn");
+const nightmareOverlay = document.getElementById("nightmareOverlay");
+let nightmareEnabled = true;
+let nightmareTimeout = null;
+let nightmareDismissTimeout = null;
+let nightmareAudioNodes = [];
+
+// =============================================
+// 5. ANSWER CHECKING
+// Accepts equivalent numbers, fractions, decimals,
+// alternative roots, and common algebra formatting.
+// =============================================
+
+function parseNumericAnswer(value) {
+    let text = String(value)
+        .trim()
+        .replace(/,/g, "")
+        .replace(/−/g, "-")
+        .replace(/\s+/g, "");
+
+    // A trailing percent sign is optional when the expected answer
+    // is entered as a percentage number (for example, 75 or 75%).
+    if (text.endsWith("%")) text = text.slice(0, -1);
+
+    const fractionMatch = text.match(
+        /^([+-]?(?:\d+(?:\.\d*)?|\.\d+))\/([+-]?(?:\d+(?:\.\d*)?|\.\d+))$/
+    );
+
+    if (fractionMatch) {
+        const numerator = Number(fractionMatch[1]);
+        const denominator = Number(fractionMatch[2]);
+        if (!Number.isFinite(numerator) || !Number.isFinite(denominator) || denominator === 0) {
+            return null;
+        }
+        return numerator / denominator;
+    }
+
+    if (/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/.test(text)) {
+        const number = Number(text);
+        return Number.isFinite(number) ? number : null;
+    }
+
+    return null;
+}
+
+function normalizeAnswer(value) {
+    return String(value)
+        .trim()
+        .toLowerCase()
+        .replace(/[−–]/g, "-")
+        .replace(/[×·]/g, "*")
+        .replace(/÷/g, "/")
+        .replace(/[²]/g, "^2")
+        .replace(/[³]/g, "^3")
+        .replace(/\bplus\b/g, "+")
+        .replace(/\bminus\b/g, "-")
+        .replace(/\s+/g, "")
+        .replace(/(sin|cos|tan|ln)\(([^()]*)\)/g, "$1$2")
+        .replace(/^the/, "");
+}
+
+function splitAlternatives(value) {
+    return String(value)
+        .trim()
+        .split(/\s+(?:or|and)\s+|\s*,\s*|\s*;\s*/i)
+        .map((part) => part.trim())
+        .filter(Boolean);
+}
+
+function canonicalFactorProduct(value) {
+    const normalized = normalizeAnswer(value);
+    const factors = normalized.match(/\([^()]+\)/g);
+    if (!factors || factors.join("") !== normalized) return null;
+    return factors.map((factor) => factor.slice(1, -1)).sort().join("*");
+}
+
+function canonicalSimpleSum(value) {
+    const normalized = normalizeAnswer(value);
+    // Only handle flat sums such as x+12, 12+x, -x+5 and 5-x.
+    // Leave products, powers and parenthesised expressions to exact matching.
+    if (/[()*^/]/.test(normalized)) return null;
+    const terms = normalized.match(/[+-]?[^+-]+/g);
+    if (!terms || terms.length < 2) return null;
+    return terms
+        .map((term) => (term[0] === "+" || term[0] === "-" ? term : "+" + term))
+        .sort()
+        .join("|");
+}
+
+function textAnswersMatch(userValue, correctValue) {
+    const user = normalizeAnswer(userValue);
+    const correct = normalizeAnswer(correctValue);
+
+    if (user === correct) return true;
+
+    // Multiplication factors can be written in either order.
+    const userFactors = canonicalFactorProduct(userValue);
+    const correctFactors = canonicalFactorProduct(correctValue);
+    if (userFactors !== null && correctFactors !== null && userFactors === correctFactors) {
+        return true;
+    }
+
+    // Addition is commutative: x+12 and 12+x are equivalent.
+    const userSum = canonicalSimpleSum(userValue);
+    const correctSum = canonicalSimpleSum(correctValue);
+    if (userSum !== null && correctSum !== null && userSum === correctSum) {
+        return true;
+    }
+
+    // Common wording variants for short factual answers.
+    const aliases = {
+        "true": ["yes"],
+        "yes": ["true"],
+        "parabola": ["parabolic curve"],
+        "zerosoftheriemannzetafunction": [
+            "zerosofzetafunction",
+            "nontrivialzerosoftheriemannzetafunction"
+        ],
+        "ce^x": ["c*e^x", "cexp(x)", "c*exp(x)"],
+        "1/s": ["s^-1", "1÷s"],
+        "unsolved": ["open", "openproblem", "unresolved", "unknown", "notsolved", "stillopen", "notyetsolved"],
+        "open": ["unsolved", "openproblem", "unresolved", "unknown", "notsolved", "stillopen", "notyetsolved"]
+    };
+
+    return (aliases[correct] || []).includes(user) ||
+           (aliases[user] || []).includes(correct);
+}
+
+function twoAnswersMatch(userValue, correctValue) {
+    const userNumber = parseNumericAnswer(userValue);
+    const correctNumber = parseNumericAnswer(correctValue);
+
+    if (userNumber !== null && correctNumber !== null) {
+        return Math.abs(userNumber - correctNumber) <= 0.0001;
+    }
+
+    return textAnswersMatch(userValue, correctValue);
+}
+
+function answersMatch(userAnswer, correctAnswer) {
+    const userParts = splitAlternatives(userAnswer);
+    const correctParts = splitAlternatives(correctAnswer);
+
+    if (userParts.length !== correctParts.length) return false;
+
+    // Match alternatives without requiring the same order.
+    const remaining = [...correctParts];
+    for (const userPart of userParts) {
+        const matchIndex = remaining.findIndex((correctPart) =>
+            twoAnswersMatch(userPart, correctPart)
+        );
+        if (matchIndex === -1) return false;
+        remaining.splice(matchIndex, 1);
+    }
+
+    return remaining.length === 0;
+}
+
+// =============================================
+// 6. STOPWATCH
+// =============================================
+
+function formatElapsedTime(totalSeconds) {
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+
+    if (hours > 0) {
+        return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+    }
+
+    return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+}
+
+function updateStopwatch() {
+    if (startTime === null) return;
+    const elapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
+    timerDisplay.textContent = formatElapsedTime(elapsedSeconds);
+}
+
+function stopStopwatch() {
+    if (startTime === null) return timerDisplay.textContent;
+
+    const elapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
+    clearInterval(stopwatchInterval);
+    stopwatchInterval = null;
+    startTime = null;
+
+    const formatted = formatElapsedTime(elapsedSeconds);
+    timerDisplay.textContent = formatted;
+    return formatted;
+}
+
+// =============================================
+// 7. RANDOM SURPRISE POP-UPS
+// =============================================
+
+const surpriseMessages = [
+    { emoji: "◉", title: "DID YOU HEAR THAT?", message: "The hallway is not empty." },
+    { emoji: "✦", title: "THE LIGHTS FLICKER", message: "Keep your eyes on the paper." },
+    { emoji: "⌁", title: "A FOOTSTEP", message: "Something moved outside." },
+    { emoji: "◌", title: "THE OLD BELL", message: "It rang once. No one is here." },
+    { emoji: "†", title: "ROOM 13", message: "You were not meant to stay late." },
+    { emoji: "∴", title: "DON'T LOOK BACK", message: "Finish the question in front of you." }
+];
+
+function showSurprisePopup() {
+    if (startTime === null || quizFinished) return;
+
+    const message = surpriseMessages[Math.floor(Math.random() * surpriseMessages.length)];
+    const popup = document.createElement("div");
+    popup.className = "surprise-popup";
+
+    const emoji = document.createElement("span");
+    emoji.className = "surprise-emoji";
+    emoji.textContent = message.emoji;
+
+    const title = document.createElement("span");
+    title.className = "surprise-title";
+    title.textContent = message.title;
+
+    const text = document.createElement("span");
+    text.className = "surprise-message";
+    text.textContent = message.message;
+
+    popup.append(emoji, title, text);
+    document.body.appendChild(popup);
+
+    const maxLeft = Math.max(0, window.innerWidth - 247);
+    const maxTop = Math.max(12, window.innerHeight - 180);
+    popup.style.left = `${12 + Math.random() * maxLeft}px`;
+    popup.style.top = `${12 + Math.random() * maxTop}px`;
+
+    window.setTimeout(() => popup.remove(), 2500);
+}
+
+function showSurpriseWord() {
+    if (quizFinished) return;
+
+    const words = ["WHO WAS THAT?", "THE BELL RANG", "STAY FOCUSED", "ROOM 13", "DID YOU HEAR IT?"];
+    const word = document.createElement("div");
+    word.className = "surprise-word";
+    word.textContent = words[Math.floor(Math.random() * words.length)];
+    document.body.appendChild(word);
+    window.setTimeout(() => word.remove(), 1400);
+}
+
+function scheduleSurprise() {
+    clearTimeout(surpriseTimeout);
+    if (startTime === null || quizFinished) return;
+
+    const delay = 5000 + Math.random() * 5000;
+    surpriseTimeout = window.setTimeout(() => {
+        if (startTime === null || quizFinished) return;
+        if (Math.random() < 0.7) showSurprisePopup();
+        else showSurpriseWord();
+        scheduleSurprise();
+    }, delay);
+}
+
+function startSurprises() {
+    stopSurprises();
+    scheduleSurprise();
+}
+
+function stopSurprises() {
+    clearTimeout(surpriseTimeout);
+    surpriseTimeout = null;
+    document.querySelectorAll(".surprise-popup, .surprise-word").forEach((element) => element.remove());
+}
+
+
+// =============================================
+// NIGHTMARE MODE — RANDOM CINEMATIC SCARE
+// Low-volume original sound sting; no external media.
+// =============================================
+
+function playNightmareSting() {
+    // Respect the soundtrack mute control: silent mode also silences the scare sting.
+    if (!audioContext || !musicEnabled) return;
+    try {
+        if (audioContext.state === "suspended") audioContext.resume();
+        const now = audioContext.currentTime;
+        const gain = audioContext.createGain();
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.exponentialRampToValueAtTime(0.055, now + 0.12);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.35);
+        gain.connect(audioContext.destination);
+
+        const low = audioContext.createOscillator();
+        low.type = "sine";
+        low.frequency.setValueAtTime(82, now);
+        low.frequency.exponentialRampToValueAtTime(43, now + 1.25);
+        low.connect(gain);
+        low.start(now);
+        low.stop(now + 1.4);
+
+        const high = audioContext.createOscillator();
+        high.type = "triangle";
+        high.frequency.setValueAtTime(164, now + 0.04);
+        high.frequency.exponentialRampToValueAtTime(92, now + 1.1);
+        const highGain = audioContext.createGain();
+        highGain.gain.setValueAtTime(0.0001, now);
+        highGain.gain.linearRampToValueAtTime(0.012, now + 0.15);
+        highGain.gain.exponentialRampToValueAtTime(0.0001, now + 1.1);
+        high.connect(highGain);
+        highGain.connect(audioContext.destination);
+        high.start(now);
+        high.stop(now + 1.15);
+        nightmareAudioNodes = [low, high, gain, highGain];
+    } catch (error) {
+        console.warn("Nightmare sound could not play:", error);
+    }
+}
+
+function showNightmare() {
+    if (!nightmareEnabled || startTime === null || quizFinished) return;
+    if (!nightmareOverlay || !nightmareOverlay.classList.contains("hidden")) return;
+
+    nightmareOverlay.classList.remove("hidden", "leaving");
+    nightmareOverlay.setAttribute("aria-hidden", "false");
+    document.body.classList.remove("nightmare-shake");
+    // Restart the short, restrained motion effect.
+    void document.body.offsetWidth;
+    document.body.classList.add("nightmare-shake");
+    playNightmareSting();
+
+    clearTimeout(nightmareDismissTimeout);
+    nightmareDismissTimeout = window.setTimeout(hideNightmare, 1850);
+}
+
+function hideNightmare() {
+    if (!nightmareOverlay || nightmareOverlay.classList.contains("hidden")) return;
+    clearTimeout(nightmareDismissTimeout);
+    nightmareOverlay.classList.add("leaving");
+    nightmareOverlay.setAttribute("aria-hidden", "true");
+    window.setTimeout(() => {
+        nightmareOverlay.classList.add("hidden");
+        nightmareOverlay.classList.remove("leaving");
+        document.body.classList.remove("nightmare-shake");
+    }, 430);
+}
+
+function scheduleNightmare() {
+    clearTimeout(nightmareTimeout);
+    if (!nightmareEnabled || startTime === null || quizFinished) return;
+    // A surprise appears at an unpredictable interval, not on every question.
+    const delay = 18000 + Math.random() * 22000;
+    nightmareTimeout = window.setTimeout(() => {
+        if (nightmareEnabled && startTime !== null && !quizFinished) showNightmare();
+        scheduleNightmare();
+    }, delay);
+}
+
+function startNightmareMode() {
+    clearTimeout(nightmareTimeout);
+    if (nightmareEnabled) scheduleNightmare();
+}
+
+function stopNightmareMode() {
+    clearTimeout(nightmareTimeout);
+    nightmareTimeout = null;
+    clearTimeout(nightmareDismissTimeout);
+    nightmareDismissTimeout = null;
+    if (nightmareOverlay) {
+        nightmareOverlay.classList.add("hidden");
+        nightmareOverlay.classList.remove("leaving");
+        nightmareOverlay.setAttribute("aria-hidden", "true");
+    }
+    document.body.classList.remove("nightmare-shake");
+}
+
+function createCelebration() {
+    // A subtle burst of dust motes / candle embers, rather than cartoon confetti.
+    for (let i = 0; i < 14; i++) {
+        const particle = document.createElement("span");
+        particle.className = "ember-particle";
+        particle.style.left = `${Math.random() * 90 + 5}%`;
+        particle.style.top = `${Math.random() * 70 + 15}%`;
+        particle.style.setProperty("--drift", `${Math.random() * 100 - 50}px`);
+        particle.style.setProperty("--rise", `${80 + Math.random() * 100}px`);
+        document.body.appendChild(particle);
+        window.setTimeout(() => particle.remove(), 1700);
+    }
+}
+
+
+// =============================================
+// ORIGINAL HAUNTED ARCADE MUSIC
+// Synthesised in-browser with Web Audio API.
+// No external audio file or copyrighted song is used.
+// =============================================
+
+const musicToggleBtn = document.getElementById("musicToggleBtn");
+let audioContext = null;
+let musicMaster = null;
+let musicScheduler = null;
+let noiseBuffer = null;
+let musicEnabled = false;
+let musicStep = 0;
+let nextMusicTime = 0;
+const MUSIC_BPM = 82;
+const MUSIC_STEP = 60 / MUSIC_BPM / 2; // eighth-note pulse
+
+// A short, original C-minor spooky melody with a playful arcade bounce.
+const hauntedMelody = [
+    72, 67, 75, 79, 82, 79, 75, 74,
+    72, 67, 68, 72, 75, 72, 70, 67,
+    65, 72, 80, 79, 77, 75, 74, 71,
+    72, 75, 79, 82, 79, 75, 74, 72
+];
+const hauntedBass = [36, 36, 36, 36, 32, 32, 32, 32, 29, 29, 29, 29, 31, 31, 31, 31];
+const hauntedChords = [
+    [48, 51, 55, 60], // C minor
+    [44, 48, 51, 56], // A-flat major
+    [41, 44, 48, 53], // F minor
+    [43, 47, 50, 55]  // G major
+];
+
+function midiToFrequency(midi) {
+    return 440 * Math.pow(2, (midi - 69) / 12);
+}
+
+function createMusicEngine() {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) {
+        throw new Error("Web Audio is not supported in this browser.");
+    }
+
+    if (audioContext) return;
+
+    audioContext = new AudioContextClass();
+    musicMaster = audioContext.createGain();
+    musicMaster.gain.value = 0;
+    musicMaster.connect(audioContext.destination);
+
+    const bufferLength = Math.floor(audioContext.sampleRate * 0.2);
+    noiseBuffer = audioContext.createBuffer(1, bufferLength, audioContext.sampleRate);
+    const data = noiseBuffer.getChannelData(0);
+    for (let i = 0; i < bufferLength; i++) {
+        data[i] = (Math.random() * 2 - 1) * (1 - i / bufferLength);
+    }
+}
+
+function scheduleTone(frequency, when, duration, waveform, volume, destination = musicMaster) {
+    const oscillator = audioContext.createOscillator();
+    const envelope = audioContext.createGain();
+    oscillator.type = waveform;
+    oscillator.frequency.setValueAtTime(frequency, when);
+    envelope.gain.setValueAtTime(0.0001, when);
+    envelope.gain.exponentialRampToValueAtTime(Math.max(0.0002, volume), when + 0.012);
+    envelope.gain.exponentialRampToValueAtTime(0.0001, when + duration);
+    oscillator.connect(envelope);
+    envelope.connect(destination);
+    oscillator.start(when);
+    oscillator.stop(when + duration + 0.025);
+}
+
+function scheduleKick(when) {
+    const oscillator = audioContext.createOscillator();
+    const envelope = audioContext.createGain();
+    oscillator.type = "sine";
+    oscillator.frequency.setValueAtTime(115, when);
+    oscillator.frequency.exponentialRampToValueAtTime(42, when + 0.16);
+    envelope.gain.setValueAtTime(0.0001, when);
+    envelope.gain.exponentialRampToValueAtTime(0.13, when + 0.008);
+    envelope.gain.exponentialRampToValueAtTime(0.0001, when + 0.19);
+    oscillator.connect(envelope);
+    envelope.connect(musicMaster);
+    oscillator.start(when);
+    oscillator.stop(when + 0.21);
+}
+
+function scheduleNoiseHit(when, volume, duration, cutoff) {
+    const source = audioContext.createBufferSource();
+    const filter = audioContext.createBiquadFilter();
+    const envelope = audioContext.createGain();
+    source.buffer = noiseBuffer;
+    filter.type = "highpass";
+    filter.frequency.setValueAtTime(cutoff, when);
+    envelope.gain.setValueAtTime(0.0001, when);
+    envelope.gain.exponentialRampToValueAtTime(volume, when + 0.006);
+    envelope.gain.exponentialRampToValueAtTime(0.0001, when + duration);
+    source.connect(filter);
+    filter.connect(envelope);
+    envelope.connect(musicMaster);
+    source.start(when);
+    source.stop(when + duration + 0.02);
+}
+
+function scheduleMusicStep(step, when) {
+    const note = hauntedMelody[step];
+    if (note !== null && note !== undefined) {
+        scheduleTone(midiToFrequency(note), when, 0.30, "sine", 0.055);
+        // A tiny bell-like overtone gives the melody its spooky arcade sparkle.
+        scheduleTone(midiToFrequency(note + 12), when + 0.025, 0.18, "triangle", 0.010);
+    }
+
+    const positionInBar = step % 8;
+    const bar = Math.floor(step / 8);
+
+    if (positionInBar === 0) {
+        hauntedChords[bar].forEach((chordNote) => {
+            scheduleTone(midiToFrequency(chordNote), when, 2.65, "sine", 0.009);
+        });
+    }
+
+    if (step % 2 === 0) {
+        const bassIndex = step % hauntedBass.length;
+        scheduleTone(midiToFrequency(hauntedBass[bassIndex]), when, 0.42, "sine", 0.026);
+        scheduleNoiseHit(when, 0.012, 0.045, 6500);
+    }
+
+    if (positionInBar === 0 || positionInBar === 4) {
+        scheduleKick(when);
+    } else if (positionInBar === 2 || positionInBar === 6) {
+        scheduleNoiseHit(when, 0.014, 0.10, 2400);
+    }
+}
+
+function musicTick() {
+    if (!musicEnabled || !audioContext) return;
+
+    const horizon = audioContext.currentTime + 0.13;
+    let safetyCount = 0;
+    while (nextMusicTime < horizon && safetyCount < 8) {
+        scheduleMusicStep(musicStep, nextMusicTime);
+        musicStep = (musicStep + 1) % hauntedMelody.length;
+        nextMusicTime += MUSIC_STEP;
+        safetyCount++;
+    }
+
+    // If the browser throttles a background tab, resume cleanly instead of
+    // trying to play a backlog of missed notes all at once.
+    if (nextMusicTime < audioContext.currentTime - 0.3) {
+        nextMusicTime = audioContext.currentTime + 0.05;
+    }
+}
+
+async function startMusic() {
+    if (musicEnabled) return;
+
+    try {
+        createMusicEngine();
+        if (audioContext.state === "suspended") await audioContext.resume();
+
+        musicEnabled = true;
+        musicStep = 0;
+        nextMusicTime = audioContext.currentTime + 0.06;
+        musicMaster.gain.cancelScheduledValues(audioContext.currentTime);
+        musicMaster.gain.setValueAtTime(musicMaster.gain.value, audioContext.currentTime);
+        musicMaster.gain.linearRampToValueAtTime(0.42, audioContext.currentTime + 0.8);
+        clearInterval(musicScheduler);
+        musicScheduler = window.setInterval(musicTick, 25);
+        musicToggleBtn.textContent = "MUTE SOUNDTRACK";
+        musicToggleBtn.setAttribute("aria-pressed", "true");
+    } catch (error) {
+        console.error("Unable to start spooky music:", error);
+        musicToggleBtn.textContent = "SOUND UNAVAILABLE";
+        musicToggleBtn.setAttribute("aria-pressed", "false");
+    }
+}
+
+function stopMusic() {
+    musicEnabled = false;
+    clearInterval(musicScheduler);
+    musicScheduler = null;
+
+    if (audioContext && musicMaster) {
+        const now = audioContext.currentTime;
+        musicMaster.gain.cancelScheduledValues(now);
+        musicMaster.gain.setValueAtTime(musicMaster.gain.value, now);
+        musicMaster.gain.linearRampToValueAtTime(0, now + 0.2);
+    }
+
+    musicToggleBtn.textContent = "PLAY HAUNTED SCORE";
+    musicToggleBtn.setAttribute("aria-pressed", "false");
+}
+
+musicToggleBtn.addEventListener("click", () => {
+    if (musicEnabled) stopMusic();
+    else startMusic();
+});
+
+nightmareToggleBtn.addEventListener("click", () => {
+    nightmareEnabled = !nightmareEnabled;
+    nightmareToggleBtn.setAttribute("aria-pressed", String(nightmareEnabled));
+    nightmareToggleBtn.textContent = nightmareEnabled ? "NIGHTMARE: ON" : "NIGHTMARE: OFF";
+    if (nightmareEnabled) startNightmareMode();
+    else stopNightmareMode();
+});
+
+nightmareOverlay.addEventListener("click", hideNightmare);
+
+// =============================================
+// 8. CAMPAIGN START AND AUTOMATIC LEVEL ORDER
+// =============================================
+
+function startCampaign() {
+    levelResults = [];
+    currentLevelIndex = 0;
+    campaignStartTime = Date.now();
+    setupArea.classList.add("hidden");
+    quizPanel.classList.remove("hidden");
+    startMusic(); // Browser audio begins only after this user click.
+    startLevel(0);
+}
+
+function startLevel(levelIndex) {
+    if (levelIndex < 0 || levelIndex >= levelOrder.length) {
+        finishCampaign();
+        return;
+    }
+
+    stopNightmareMode();
+    clearInterval(stopwatchInterval);
+    clearTimeout(advanceTimeout);
+    clearTimeout(transitionTimeout);
+    stopSurprises();
+
+    currentLevelIndex = levelIndex;
+    currentLevel = levelOrder[currentLevelIndex];
+    questions = [...questionsByLevel[currentLevel]];
+    questionIndex = 0;
+    score = 0;
+    answeredCurrent = false;
+    quizFinished = false;
+    startTime = Date.now();
+
+    const stageNumber = currentLevelIndex + 1;
+    const stagePercentValue = Math.round((stageNumber / levelOrder.length) * 100);
+    stageLabel.textContent = `STAGE ${stageNumber} OF ${levelOrder.length} · ${currentLevel}`;
+    stagePercent.textContent = `${stagePercentValue}%`;
+    progressFill.style.width = `${stagePercentValue}%`;
+
+    questionArea.classList.toggle("final-boss", currentLevel === "ULTIMATE FINAL BOSS");
+    questionHint.textContent = currentLevel === "ULTIMATE FINAL BOSS"
+        ? "THE FINAL BOSS. This checks the current status of a famous open mathematics problem."
+        : "WORK CAREFULLY. THE ROOM IS QUIET.";
+
+    timerDisplay.textContent = "00:00";
+    scoreDisplay.textContent = `0 / ${questions.length}`;
+    result.classList.add("hidden");
+    campaignHistory.classList.add("hidden");
+    restartCampaignBtn.classList.add("hidden");
+    feedback.textContent = "";
+    feedback.className = "feedback";
+
+    answerForm.classList.remove("hidden");
+    renderQuestion();
+    updateStopwatch();
+    stopwatchInterval = window.setInterval(updateStopwatch, 1000);
+    startSurprises();
+    startNightmareMode();
+}
+
+function renderQuestion() {
+    const currentQuestion = questions[questionIndex];
+    questionNumber.textContent = `${questionIndex + 1} / ${questions.length}`;
+    questionDisplay.textContent = currentQuestion.q;
+
+    answerInput.value = "";
+    answerInput.disabled = false;
+    submitBtn.disabled = false;
+    submitBtn.textContent = "CHECK ANSWER";
+
+    feedback.textContent = "";
+    feedback.className = "feedback";
+    answeredCurrent = false;
+    answerInput.focus();
+}
+
+// =============================================
+// 9. CHECK ANSWER AND AUTOMATICALLY ADVANCE
+// =============================================
+
+function checkAnswer() {
+    if (answeredCurrent || quizFinished) return;
+
+    const userAnswer = answerInput.value.trim();
+    if (userAnswer === "") {
+        feedback.textContent = "PLEASE ENTER AN ANSWER.";
+        feedback.className = "feedback incorrect";
+        answerInput.focus();
+        return;
+    }
+
+    answeredCurrent = true;
+    answerInput.disabled = true;
+    submitBtn.disabled = true;
+
+    const correctAnswer = questions[questionIndex].a;
+    const isCorrect = answersMatch(userAnswer, correctAnswer);
+
+    if (isCorrect) {
+        score++;
+        feedback.textContent = "CORRECT. CONTINUE.";
+        feedback.className = "feedback correct";
+        showSurpriseWord();
+        showSurprisePopup();
+        createCelebration();
+    } else {
+        feedback.textContent = `NOT QUITE. THE ANSWER IS ${correctAnswer}.`;
+        feedback.className = "feedback incorrect";
+        if (nightmareEnabled && Math.random() < 0.28) {
+            window.setTimeout(showNightmare, 350);
+        }
+    }
+
+    scoreDisplay.textContent = `${score} / ${questions.length}`;
+
+    if (questionIndex === questions.length - 1) {
+        const completedIn = stopStopwatch();
+        quizFinished = true;
+        stopSurprises();
+        levelResults.push({
+            level: currentLevel,
+            score,
+            total: questions.length,
+            time: completedIn
+        });
+        advanceTimeout = window.setTimeout(() => finishLevel(completedIn), 900);
+        return;
+    }
+
+    // There is no Next Question button. The quiz advances on its own.
+    advanceTimeout = window.setTimeout(() => {
+        if (quizFinished) return;
+        questionIndex++;
+        renderQuestion();
+    }, 1600);
+}
+
+// =============================================
+// 10. LEVEL RESULTS AND AUTOMATIC NEXT LEVEL
+// =============================================
+
+function finishLevel(completedIn) {
+    if (!quizFinished) return;
+
+    stopNightmareMode();
+    clearInterval(stopwatchInterval);
+    stopwatchInterval = null;
+    stopSurprises();
+
+    questionDisplay.textContent = currentLevel === "ULTIMATE FINAL BOSS"
+        ? "THE FINAL BELL HAS RUNG."
+        : `${currentLevel.toUpperCase()} COMPLETE.`;
+    answerForm.classList.add("hidden");
+
+    const percentage = Math.round((score / questions.length) * 100);
+    const isFinalLevel = currentLevelIndex === levelOrder.length - 1;
+
+    resultHeading.textContent = isFinalLevel
+        ? "YOU REACHED THE FINAL ENDING"
+        : "LEVEL CLEARED";
+    finalLevel.textContent = currentLevel;
+    finalScore.textContent = `${score} / ${questions.length}`;
+    finalPercentage.textContent = `${percentage}%`;
+    finalTime.textContent = completedIn;
+
+    if (score === questions.length) {
+        finalMessage.textContent = "PERFECT SCORE. A REMARKABLE RESULT.";
+    } else if (score >= Math.ceil(questions.length * 0.7)) {
+        finalMessage.textContent = "WELL DONE. THE NEXT DOOR IS OPENING.";
+    } else {
+        finalMessage.textContent = "LEVEL COMPLETE. KEEP GOING — THE CAMPAIGN CONTINUES.";
+    }
+
+    result.classList.remove("hidden");
+
+    if (!isFinalLevel) {
+        const nextLevel = levelOrder[currentLevelIndex + 1];
+        nextLevelNotice.textContent = `NEXT: ${nextLevel.toUpperCase()} — STARTING AUTOMATICALLY IN 5 SECONDS. NO LEVEL SELECTION NEEDED.`;
+        campaignHistory.classList.add("hidden");
+        restartCampaignBtn.classList.add("hidden");
+        transitionTimeout = window.setTimeout(() => {
+            startLevel(currentLevelIndex + 1);
+        }, 5000);
+    } else {
+        finishCampaign();
+    }
+}
+
+// =============================================
+// 11. FINAL CAMPAIGN REPORT
+// =============================================
+
+function finishCampaign() {
+    stopNightmareMode();
+    clearInterval(stopwatchInterval);
+    clearTimeout(advanceTimeout);
+    clearTimeout(transitionTimeout);
+    stopSurprises();
+
+    const totalScore = levelResults.reduce((sum, entry) => sum + entry.score, 0);
+    const totalQuestions = levelResults.reduce((sum, entry) => sum + entry.total, 0);
+    const totalPercentage = totalQuestions
+        ? Math.round((totalScore / totalQuestions) * 100)
+        : 0;
+    const campaignSeconds = campaignStartTime === null
+        ? 0
+        : Math.floor((Date.now() - campaignStartTime) / 1000);
+
+    questionDisplay.textContent = "THE HAUNTED MATHS ROOM IS CONQUERED.";
+    resultHeading.textContent = "THE CAMPAIGN IS COMPLETE";
+    finalLevel.textContent = "ALL 13 STAGES";
+    finalScore.textContent = `${totalScore} / ${totalQuestions}`;
+    finalPercentage.textContent = `${totalPercentage}%`;
+    finalTime.textContent = formatElapsedTime(campaignSeconds);
+    finalMessage.textContent = "You began at K2, passed every stage, and faced the ultimate final boss.";
+    nextLevelNotice.textContent = "THERE ARE NO MORE LEVELS. YOU HAVE REACHED THE END.";
+
+    campaignHistory.replaceChildren();
+    const historyHeading = document.createElement("h3");
+    historyHeading.textContent = "YOUR FULL EXAMINATION RECORD";
+    campaignHistory.appendChild(historyHeading);
+
+    levelResults.forEach((entry, index) => {
+        const row = document.createElement("div");
+        row.className = "campaign-history-row";
+
+        const name = document.createElement("span");
+        name.textContent = `${index + 1}. ${entry.level}`;
+
+        const resultText = document.createElement("strong");
+        resultText.textContent = `${entry.score}/${entry.total} · ${entry.time}`;
+
+        row.append(name, resultText);
+        campaignHistory.appendChild(row);
+    });
+
+    campaignHistory.classList.remove("hidden");
+    restartCampaignBtn.classList.remove("hidden");
+    restartCampaignBtn.focus();
+}
+
+// =============================================
+// 12. BUTTON EVENTS
+// =============================================
+
+startK2Btn.addEventListener("click", startCampaign);
+submitBtn.addEventListener("click", checkAnswer);
+answerInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        checkAnswer();
+    }
+});
+restartCampaignBtn.addEventListener("click", () => {
+    clearInterval(stopwatchInterval);
+    clearTimeout(advanceTimeout);
+    clearTimeout(transitionTimeout);
+    stopSurprises();
+    startCampaign();
+});
+
+</script>
+</body>
+</html>
